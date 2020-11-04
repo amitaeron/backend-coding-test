@@ -1,0 +1,363 @@
+{
+    "openapi" : "3.0.0",
+    "info" : {
+      "version" : "1.0.0-oas3",
+      "title" : "REST API For Rides",
+      "description" : "This is a Node.js project that contains APIs which can be used for saving and fetching rides"
+    },
+    "host" : "localhost:8010",
+    "basePath" : "/",
+    "tags" : [ ],
+    "schemes" : [ "http" ],
+    "securityDefinitions" : { },
+    "consumes" : [ ],
+    "produces" : [ ],
+    "paths" : {
+      "/health" : {
+        "get" : {
+          "tags" : [ ],
+          "summary" : "Status of server",
+          "description" : "Check the status of server",
+          "parameters" : [ ],
+          "responses" : {
+            "200" : {
+              "description" : "Healthy"
+            }
+          }
+        }
+      },
+      "/rides" : {
+        "post" : {
+          "tags" : [ ],
+          "summary" : "Post the ride",
+          "description" : "Save a ride to the DB",
+          "requestBody" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ridePayload"
+                }
+              }
+            }
+          },
+          "responses" : {
+            "201" : {
+              "content" : {
+                "application/json" : {
+                  "schema" : {
+                    "$ref" : "#/components/schemas/ride"
+                  },
+                  "example" : {
+                    "rideID" : 1,
+                    "startLat" : -2,
+                    "startLong" : -43,
+                    "endLat" : 78,
+                    "endLong" : 89,
+                    "riderName" : "abc",
+                    "driverName" : "xyz",
+                    "driverVehicle" : "zzzz",
+                    "created" : "2020-11-02 15:57:52"
+                  }
+                }
+              },
+              "description" : "Ride Created"
+            },
+            "400" : {
+              "content" : {
+                "application/json" : {
+                  "schema" : {
+                    "oneOf" : [ {
+                      "$ref" : "#/components/schemas/startLatAndLong"
+                    }, {
+                      "$ref" : "#/components/schemas/endLatAndLong"
+                    }, {
+                      "$ref" : "#/components/schemas/riderName"
+                    }, {
+                      "$ref" : "#/components/schemas/driverName"
+                    }, {
+                      "$ref" : "#/components/schemas/driverVehicle"
+                    } ],
+                    "example" : {
+                      "error_code" : "VALIDATION_ERROR",
+                      "message" : "Start latitude and longitude must be between 90 - 90 and -180 to 180 degrees respectively"
+                    }
+                  }
+                }
+              },
+              "description" : "Validation Error"
+            },
+            "500" : {
+              "content" : {
+                "application/json" : {
+                  "example" : {
+                    "error_code" : "SERVER_ERROR",
+                    "message" : "Unknown error"
+                  }
+                }
+              },
+              "description" : "Internal Server Error"
+            }
+          }
+        },
+        "get" : {
+          "tags" : [ ],
+          "summary" : "Get Rides",
+          "description" : "Get a ride from DB",
+          "parameters" : [ ],
+          "responses" : {
+            "200" : {
+              "content" : {
+                "application/json" : {
+                  "schema" : {
+                    "type" : "array",
+                    "items" : {
+                      "$ref" : "#/components/schemas/ride"
+                    }
+                  },
+                  "example" : [ {
+                    "rideID" : 1,
+                    "startLat" : -2,
+                    "startLong" : -43,
+                    "endLat" : 78,
+                    "endLong" : 89,
+                    "riderName" : "abc",
+                    "driverName" : "xyz",
+                    "driverVehicle" : "zz",
+                    "created" : "2020-11-02 15:57:52"
+                  } ]
+                }
+              },
+              "description" : "All Rides"
+            },
+            "404" : {
+              "content" : {
+                "application/json" : {
+                  "example" : {
+                    "error_code" : "RIDES_NOT_FOUND_ERROR",
+                    "message" : "Could not find any rides"
+                  }
+                }
+              },
+              "description" : "Not Found"
+            },
+            "500" : {
+              "content" : {
+                "application/json" : {
+                  "example" : {
+                    "error_code" : "SERVER_ERROR",
+                    "message" : "Unknown error"
+                  }
+                }
+              },
+              "description" : "Internal Server Error"
+            }
+          }
+        }
+      },
+      "/rides/{id}" : {
+        "get" : {
+          "tags" : [ ],
+          "summary" : "Get a ride",
+          "description" : "Get details of a ride matching with given id",
+          "parameters" : [ {
+            "name" : "id",
+            "in" : "path",
+            "required" : true,
+            "description" : "Id of the ride",
+            "schema" : {
+              "type" : "integer"
+            }
+          } ],
+          "responses" : {
+            "200" : {
+              "content" : {
+                "application/json" : {
+                  "schema" : {
+                    "$ref" : "#/components/schemas/ride"
+                  },
+                  "example" : {
+                    "rideID" : 1,
+                    "startLat" : -2,
+                    "startLong" : -43,
+                    "endLat" : 78,
+                    "endLong" : 89,
+                    "riderName" : "abc",
+                    "driverName" : "xyz",
+                    "driverVehicle" : "zz",
+                    "created" : "2020-11-02 15:57:52"
+                  }
+                }
+              },
+              "description" : "Ride"
+            },
+            "404" : {
+              "content" : {
+                "application/json" : {
+                  "example" : {
+                    "error_code" : "RIDES_NOT_FOUND_ERROR",
+                    "message" : "Could not find any rides"
+                  }
+                }
+              },
+              "description" : "Not Found"
+            },
+            "500" : {
+              "content" : {
+                "application/json" : {
+                  "example" : {
+                    "error_code" : "SERVER_ERROR",
+                    "message" : "Unknown error"
+                  }
+                }
+              },
+              "description" : "Internal Server Error"
+            }
+          }
+        }
+      }
+    },
+    "definitions" : { },
+    "components" : {
+      "schemas" : {
+        "startLatAndLong" : {
+          "type" : "object",
+          "properties" : {
+            "error_code" : {
+              "type" : "string",
+              "description" : "VALIDATION_ERROR"
+            },
+            "messages" : {
+              "type" : "string",
+              "description" : "Start latitude and longitude must be between 90 - 90 and -180 to 180 degrees respectively"
+            }
+          }
+        },
+        "endLatAndLong" : {
+          "type" : "object",
+          "properties" : {
+            "error_code" : {
+              "type" : "string",
+              "description" : "VALIDATION_ERROR"
+            },
+            "message" : {
+              "type" : "string",
+              "description" : "End latitude and longitude must be between 90 - 90 and -180 to 180 degrees respectively"
+            }
+          }
+        },
+        "riderName" : {
+          "type" : "object",
+          "properties" : {
+            "error_code" : {
+              "type" : "string",
+              "description" : "VALIDATION_ERROR"
+            },
+            "message" : {
+              "type" : "string",
+              "description" : "Rider name must be a non empty string"
+            }
+          }
+        },
+        "driverName" : {
+          "type" : "object",
+          "properties" : {
+            "error_code" : {
+              "type" : "string",
+              "description" : "VALIDATION_ERROR"
+            },
+            "message" : {
+              "type" : "string",
+              "description" : "Driver name must be a non empty string"
+            }
+          }
+        },
+        "driverVehicle" : {
+          "type" : "object",
+          "properties" : {
+            "error_code" : {
+              "type" : "string",
+              "description" : "VALIDATION_ERROR"
+            },
+            "message" : {
+              "type" : "string",
+              "description" : "Driver vehicle must be a non empty string"
+            }
+          }
+        },
+        "ride" : {
+          "type" : "object",
+          "properties" : {
+            "rideID" : {
+              "type" : "string",
+              "description" : "Ride ID"
+            },
+            "startLat" : {
+              "type" : "string",
+              "description" : "Start Latitude"
+            },
+            "startLong" : {
+              "type" : "string",
+              "description" : "Start Longitude"
+            },
+            "endLat" : {
+              "type" : "string",
+              "description" : "End Latitude"
+            },
+            "endLong" : {
+              "type" : "string",
+              "description" : "End Longitude"
+            },
+            "riderName" : {
+              "type" : "string",
+              "description" : "Rider Name"
+            },
+            "driverName" : {
+              "type" : "string",
+              "description" : "Driver Name"
+            },
+            "driverVehicle" : {
+              "type" : "string",
+              "description" : "Driver Vehicle"
+            },
+            "createdAt" : {
+              "type" : "string",
+              "description" : "Creation Date"
+            }
+          }
+        },
+        "ridePayload" : {
+          "type" : "object",
+          "properties" : {
+            "start_lat" : {
+              "type" : "integer",
+              "description" : "Start Latitude"
+            },
+            "end_lat" : {
+              "type" : "integer",
+              "description" : "End Latitude"
+            },
+            "start_long" : {
+              "type" : "integer",
+              "description" : "Start Longitude"
+            },
+            "end_long" : {
+              "type" : "integer",
+              "description" : "End Longitude"
+            },
+            "rider_name" : {
+              "type" : "string",
+              "description" : "Rider Name"
+            },
+            "driver_name" : {
+              "type" : "string",
+              "description" : "Driver Name"
+            },
+            "driver_vehicle" : {
+              "type" : "integer",
+              "description" : "Driver Vehicle"
+            }
+          }
+        }
+      }
+    }
+  }
