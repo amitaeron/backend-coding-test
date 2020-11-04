@@ -1,0 +1,36 @@
+config:
+  target: "http://localhost:8010"
+  phases:
+    - duration: 30
+      arrivalRate: 100
+scenarios:
+  - flow:
+    - get:
+        url: "/health"
+  - flow:
+    - post:
+        url: "/rides"
+        json:
+          start_lat: 1
+          start_long: 153
+          end_lat: 78
+          end_long: 179
+          rider_name: "Amit Gupta"
+          driver_name: "Anshi"
+          driver_vehicle: "BMW"
+        capture:
+          json: "$.rideID"
+          as: "rideID"
+    - get:
+        url: "/rides/{{ rideID }}"
+  - flow:
+    - loop:
+      - get:
+            url: "/rides"
+            qs:
+              page_no: "{{ $loopElement }}"
+              page_size: 5
+      over: 
+        - 1
+        - 2
+        - 3
