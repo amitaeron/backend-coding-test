@@ -103,7 +103,23 @@
           "tags" : [ ],
           "summary" : "Get Rides",
           "description" : "Get a ride from DB",
-          "parameters" : [ ],
+          "parameters" : [ {
+            "name" : "pageNmber",
+            "in" : "query",
+            "required" : true,
+            "description" : "Page Number",
+            "schema" : {
+              "type" : "integer"
+            }
+          }, {
+            "name" : "recordPerPage",
+            "in" : "query",
+            "required" : true,
+            "description" : "Record Per Page",
+            "schema" : {
+              "type" : "integer"
+            }
+          } ],
           "responses" : {
             "200" : {
               "content" : {
@@ -128,6 +144,17 @@
                 }
               },
               "description" : "All Rides"
+            },
+            "400" : {
+              "content" : {
+                "application/json" : {
+                  "example" : {
+                    "error_code" : "VALIDATION_ERROR",
+                    "message" : "Missing PageNumber or RecordPerPage parameter."
+                  }
+                }
+              },
+              "description" : "Bad Request"
             },
             "404" : {
               "content" : {

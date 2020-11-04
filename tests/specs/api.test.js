@@ -313,18 +313,46 @@ describe('API tests', () => {
 
   describe('GET /rides', () => {
 
-    it('should return rides ', (done) => {
+    it('should return bad request error when pageNumber and recordPerPage is not given', (done) => {
       request(app)
         .get('/rides')
         .expect('Content-Type', /json/)
-        .expect(200)
+        .expect(400)
         .end(function(err, res) {
           if (err) {
             return done(err);
           }
-          expect(res.body[0].riderName).to.equals('abc');
           done();
         });
+
+    });
+
+    it('should return rides on given pageNumber', (done) => {
+      const values = [];
+      let placeHolders = '';
+
+      for (let i = 1; i<=20; ++i) {
+        values.push([1, 143, 78, 89, 'abc', 'xyz', 'zz']);
+        if (placeHolders !== '') {
+          placeHolders += ',';
+        }
+        placeHolders += '(\'?\', \'?\', \'?\', \'?\', \'?\', \'?\', \'?\')';
+      }
+
+      db.run(`INSERT INTO Rides(startLat, startLong, endLat, endLong, riderName, driverName, driverVehicle) VALUES ${placeHolders}`, values, function (err) {
+        request(app)
+          .get('/rides?pageNumber=2&recordPerPage=10')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(function(err, res) {
+            if (err) {
+              return done(err);
+            }
+            expect(res.body.recordCount).to.equals(10);
+            done();
+          });
+
+      });
 
     });
 
@@ -358,7 +386,7 @@ describe('API tests', () => {
       db.exec('DELETE FROM Rides', (err, res) => {
 
         request(app)
-          .get('/rides')
+          .get('/rides?pageNumber=1&recordPerPage=10')
           .expect('Content-Type', /json/)
           .expect(404, done);
       });
