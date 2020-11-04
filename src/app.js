@@ -85,7 +85,27 @@ module.exports = (db) => {
   });
 
   app.get('/rides', (req, res) => {
-    db.all('SELECT * FROM Rides', function (err, rows) {
+    const pageNumber = Number(req.query.pageNumber);
+    const recordPerPage = Number(req.query.recordPerPage);
+
+    if (isNaN(pageNumber) && isNaN(recordPerPage)){
+      return res.status(400).send({
+        error_code: 'VALIDATION_ERROR',
+        message: 'Missing PageNumber or RecordPerPage parameter.'
+      });
+    }
+    if (!isNaN(pageNumber) !== !isNaN(recordPerPage)){
+      return res.status(400).send({
+        error_code: 'VALIDATION_ERROR',
+        message: 'Wrong PageNumber or RecordPerPage.'
+      });
+    } else if (pageNumber < 1 || recordPerPage < 1){
+      return res.status(400).send({
+        error_code: 'VALIDATION_ERROR',
+        message: 'Wrong PageNumber or RecordPerPage.'
+      });
+    }
+    db.all(`SELECT * FROM Rides limit ${recordPerPage} offset ${((pageNumber - 1)*recordPerPage)}`, function (err, rows) {
       if (err) {
         logger.error('Unknown error');
         return res.status(500).send({
@@ -102,7 +122,10 @@ module.exports = (db) => {
         });
       }
       logger.info(rows);
-      res.status(200).send(rows);
+      res.status(200).send({
+        recordCount: rows.length,
+        rides: rows
+      });
     });
   });
 
