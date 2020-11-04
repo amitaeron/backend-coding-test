@@ -393,4 +393,14 @@ describe('API tests', () => {
 
     });
   });
+
+  describe('Check SQL Injection vulnerability', () => {
+    it('should return not found error if we provide sql statement for query parameters', (done) => {
+      request(app)
+        .get('/rides/DELETE FROM Rides')
+        .expect('Content-Type', /json/)
+        .expect(404, done);
+    });
+  });
+
 });

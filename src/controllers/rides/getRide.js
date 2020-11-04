@@ -45,7 +45,7 @@ const getRideById = async (req, res, db) => {
 const getAllRidesFromDb = async (db, pageNumber, recordPerPage) => {
   return new Promise((res, rej) => {
 
-    db.all(`SELECT * FROM Rides limit ${recordPerPage} offset ${(pageNumber - 1)*recordPerPage}`, function (err, rows) {
+    db.all('SELECT * FROM Rides limit ? offset ?', [recordPerPage, ((pageNumber - 1)*recordPerPage)], function (err, rows) {
       if (err) {
         rej(serverError(err));
       }
@@ -59,7 +59,7 @@ const getAllRidesFromDb = async (db, pageNumber, recordPerPage) => {
 const getRidesFromDbById = async (db, id) => {
   return new Promise((res, rej) => {
 
-    db.all(`SELECT * FROM Rides WHERE rideID='${id}'`, function (err, rows) {
+    db.all('SELECT * FROM Rides WHERE rideID= ?', [id], function (err, rows) {
       if (err) {
         rej(serverError(err));
       }
